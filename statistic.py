@@ -3,30 +3,35 @@ from dataset import *
 import time
 from functools import wraps
 
+sorted_algorithms = {select_sort:"select_sort",bubble_sort:"bubble_sort"}
 
-def fn_timer(function):
-    @wraps(function)
-    def function_timer(*args, **kwargs):
-        t0 = time.time()
-        result = function(*args, **kwargs)
-        t1 = time.time()
-        print("Total time running %s seconds" %
-              (str(t1 - t0))
-              )
-        return result
-    return function_timer
-
-@fn_timer
-def sort_timer(sort_func,n):
-    '''
-    :param sort_func: 对应的排序方法
-    :param n:  数据规模
-    :return: 运行完成的时间
-    '''
-    d = dataset()
-    for l in d.load_data(n):
-        l = sort_func(l)
-        #print(l)
+class algorithm_analysis:
+    def __init__(self,_sort_algorithms):
+        """
+        :param _sort_algorithms: 排序算法的列表
+        """
+        self.sort_algorithms = _sort_algorithms         #各个算法的名字
+        self.costed_time = {}                            #用于存储算法对应的时间
+        self.costed_space = {}                          #用于存储算法对应的空间
+        for name in list(self.sort_algorithms.values()):
+            self.costed_time[name] = []
+            self.costed_space[name] = []
+    def test_time(self,n):
+        """
+        测试各个算法所用的时间
+        :param n: 数据的规模
+        :return: 数据保存再costed_time 里面
+        """
+        #TODO :后面可以整个进度条
+        for sort_fun in list(self.sort_algorithms.keys()):
+            for l in dataset.load_data(n):
+                t0 = time.time()
+                result = sort_fun(l)
+                t1 = time.time()
+                self.costed_time[self.sort_algorithms[sort_fun]].append(t1 - t0)
 
 if __name__ == '__main__':
-    sort_timer(select_sort,1000);
+    a = algorithm_analysis(sorted_algorithms)
+    a.test_time(1000)
+    for func_name , cost_time in a.costed_time.items():
+        print(func_name,cost_time[-5:])

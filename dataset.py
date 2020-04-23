@@ -21,10 +21,10 @@ class dataset():
                 sep = ','
                 f.write(sep.join(l))
                 f.close()
-
-    def load_data(self,n):
+    @staticmethod
+    def load_data(n):
         '''
-        直接把数据输出去
+        直接把乱序数据输出去
         :param n: n 数据规模
         :return:
         '''
@@ -33,9 +33,30 @@ class dataset():
             shuffle(l)
             yield l
 
+    @staticmethod
+    def load_order_data(n):
+        '''
+        返回顺序的数据
+        :param n: n 数据规模
+        :return:
+        '''
+        for i in range(1,n + 1):
+            l = [str(j) for j in range(i)]
+            yield l
+
+    @staticmethod
+    def load_reorder_data(n):
+        '''
+        返回逆序的数据
+        :param n: n 数据规模
+        :return:
+        '''
+        for i in range(1, n + 1):
+            l = [str(j) for j in range(i)].reverse()
+            yield l
+
 if __name__ == '__main__':
-    a = dataset()
-    for l in a.load_data(1000):
+    for l in dataset.load_data(1000):
         print(l)
     print("finish")
 
