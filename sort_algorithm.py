@@ -324,7 +324,10 @@ def main():
 
     def m(a):
         print(a-memory)
-
+    # Warning:
+    #   1. The total progress of merge sort and quick sort is hard to calculate
+    #   2. The memory usage is not accuracy enough and not real-time, consider creating a new thread to capture
+    #      the memory usage every few milliseconds
     d = list(np.random.randint(0, 10000, 100000))
     merge_sort(list(d), memory_callback=m)
 
