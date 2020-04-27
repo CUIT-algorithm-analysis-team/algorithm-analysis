@@ -1,5 +1,7 @@
 import numpy as np
 import math
+import psutil
+import os
 
 
 def selection_sort(data: list, progress_callback=None):
@@ -17,7 +19,7 @@ def selection_sort(data: list, progress_callback=None):
                 index = j
         data[i], data[index] = data[index], data[i]
         if progress_callback is not None:
-            progress_callback(i+1, total)
+            progress_callback(i + 1, total, psutil.Process(os.getpid()).memory_info().rss / 1024)
 
     return data
 
@@ -35,7 +37,7 @@ def bubble_sort(data: list, progress_callback=None):
             if data[j] > data[j + 1]:
                 data[j + 1], data[j] = data[j], data[j + 1]
         if progress_callback is not None:
-            progress_callback(i+1, total)
+            progress_callback(i + 1, total, psutil.Process(os.getpid()).memory_info().rss / 1024)
 
     return data
 
@@ -53,7 +55,7 @@ def insertion_sort(data: list, progress_callback=None):
             if data[i] < data[j]:
                 data[j], data[i] = data[i], data[j]
         if progress_callback is not None:
-            progress_callback(i+1, total)
+            progress_callback(i + 1, total, psutil.Process(os.getpid()).memory_info().rss / 1024)
 
     return data
 
@@ -70,10 +72,11 @@ def merge_sort(data: list, progress_callback=None):
 
     merge_sort.progress += 1
     total = 1000
-    if progress_callback is not None:
-        progress_callback(merge_sort.progress, total)
 
     new_data = [0] * len(data)
+
+    if progress_callback is not None:
+        progress_callback(merge_sort.progress, total, psutil.Process(os.getpid()).memory_info().rss / 1024)
     if 2 == len(data):
         new_data = data if data[0] < data[1] else data[::-1]
     elif 2 < len(data):
@@ -108,7 +111,7 @@ def quick_sort(data: list, progress_callback=None):
     quick_sort.progress += 1
     total = 1000
     if progress_callback is not None:
-        progress_callback(quick_sort.progress, total)
+        progress_callback(quick_sort.progress, total, psutil.Process(os.getpid()).memory_info().rss / 1024)
 
     if len(data) > 1:
         l, r, base = 0, len(data) - 1, data[0]
@@ -141,14 +144,14 @@ def heap_sort(data: list, progress_callback=None):
         data = adjust_heap(data, i, len(data) - 1)
         progress += 1
         if progress_callback is not None:
-            progress_callback(progress, total)
+            progress_callback(progress, total, psutil.Process(os.getpid()).memory_info().rss / 1024)
 
     for i in range(len(data) - 1, 0, -1):
         data[0], data[i] = data[i], data[0]
         data = adjust_heap(data, 0, i - 1)
         progress += 1
         if progress_callback is not None:
-            progress_callback(progress, total)
+            progress_callback(progress, total, psutil.Process(os.getpid()).memory_info().rss / 1024)
 
     return data
 
@@ -192,7 +195,7 @@ def shell_sort(data: list, progress_callback=None):
                 i -= k
         progress += 1
         if progress_callback is not None:
-            progress_callback(progress, total)
+            progress_callback(progress, total, psutil.Process(os.getpid()).memory_info().rss / 1024)
         k //= 2
 
     return data
@@ -216,7 +219,7 @@ def counting_sort(data: list, progress_callback=None):
         bucket[data[i] - min_value] += 1
         progress += 1
         if progress_callback is not None:
-            progress_callback(progress, total)
+            progress_callback(progress, total, psutil.Process(os.getpid()).memory_info().rss / 1024)
 
     for i in range(len(bucket)):
         for j in range(bucket[i]):
@@ -224,7 +227,7 @@ def counting_sort(data: list, progress_callback=None):
             index += 1
             progress += 1
         if progress_callback is not None:
-            progress_callback(progress, total)
+            progress_callback(progress, total, psutil.Process(os.getpid()).memory_info().rss / 1024)
 
     return new_data
 
@@ -255,7 +258,7 @@ def radix_sort(data: list, progress_callback=None):
         progress += 1
 
         if progress_callback is not None:
-            progress_callback(progress, total)
+            progress_callback(progress, total, psutil.Process(os.getpid()).memory_info().rss / 1024)
 
     return data
 
@@ -277,14 +280,17 @@ def check(data: list):
 
 
 def main():
-    def p(i, j):
-        print(i, j)
-
-    d = list(np.random.randint(0, 1000, 10000))
-    d = shell_sort(list(d), p)
+    # i: progress, j: total_progress, k: memory
+    def p(i, j, k):
+        print(k)
+        # print(i, j)
+        a = 0
+    print(psutil.Process(os.getpid()).memory_info().rss / 1024 / 1024)
+    d = list(np.random.randint(0, 1000, 100000))
+    d = merge_sort(list(d), p)
     print(d)
-
     print(check(d))
+    print(psutil.Process(os.getpid()).memory_info().rss / 1024 / 1024)
 
 
 if __name__ == '__main__':
