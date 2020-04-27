@@ -1,62 +1,84 @@
 import numpy as np
+import math
 
 
-def selection_sort(data: list):
+def selection_sort(data: list, progress_callback=None):
     """
     Selection sort.
+    :param progress_callback:
     :param data:
     :return:
     """
+    total = len(data) - 1
     for i in range(len(data) - 1):
         index = i
         for j in range(i + 1, len(data)):
             if data[index] > data[j]:
                 index = j
         data[i], data[index] = data[index], data[i]
+        if progress_callback is not None:
+            progress_callback(i+1, total)
 
     return data
 
 
-def bubble_sort(data: list):
+def bubble_sort(data: list, progress_callback=None):
     """
     Bubble sort.
+    :param progress_callback:
     :param data:
     :return:
     """
+    total = len(data) - 1
     for i in range(len(data) - 1):
         for j in range(len(data) - i - 1):
             if data[j] > data[j + 1]:
                 data[j + 1], data[j] = data[j], data[j + 1]
+        if progress_callback is not None:
+            progress_callback(i+1, total)
 
     return data
 
 
-def insertion_sort(data: list):
+def insertion_sort(data: list, progress_callback=None):
     """
     Insertion sort.
+    :param progress_callback:
     :param data:
     :return:
     """
+    total = len(data)
     for i in range(1, len(data)):
         for j in range(0, i):
             if data[i] < data[j]:
                 data[j], data[i] = data[i], data[j]
+        if progress_callback is not None:
+            progress_callback(i+1, total)
 
     return data
 
 
-def merge_sort(data: list):
+def merge_sort(data: list, progress_callback=None):
     """
     Merge sort
+    :param progress_callback:
     :param data:
     :return:
     """
+    if not hasattr(merge_sort, "progress"):
+        merge_sort.progress = 0
+
+    merge_sort.progress += 1
+    total = 1000
+    if progress_callback is not None:
+        progress_callback(merge_sort.progress, total)
+
     new_data = [0] * len(data)
     if 2 == len(data):
         new_data = data if data[0] < data[1] else data[::-1]
     elif 2 < len(data):
-        data[0: len(data) // 2] = merge_sort(data[0: len(data) // 2])
-        data[len(data) // 2: len(data)] = merge_sort(data[len(data) // 2: len(data)])
+        data[0: len(data) // 2] = merge_sort(data[0: len(data) // 2], progress_callback)
+        data[len(data) // 2: len(data)] = merge_sort(data[len(data) // 2: len(data)], progress_callback)
         i, j, k = 0, len(data) // 2, 0
         while i != len(data) // 2 and j != len(data):
             if data[i] < data[j]:
@@ -73,12 +95,21 @@ def merge_sort(data: list):
     return new_data
 
 
-def quick_sort(data: list):
+def quick_sort(data: list, progress_callback=None):
     """
     Quick sort.
+    :param progress_callback:
     :param data:
     :return:
     """
+    if not hasattr(quick_sort, "progress"):
+        quick_sort.progress = 0
+
+    quick_sort.progress += 1
+    total = 1000
+    if progress_callback is not None:
+        progress_callback(quick_sort.progress, total)
+
     if len(data) > 1:
         l, r, base = 0, len(data) - 1, data[0]
         while l < r:
@@ -90,24 +121,34 @@ def quick_sort(data: list):
             data[r] = data[l]
 
         data[l] = base
-        data[0: l] = quick_sort(data[0: l])
-        data[r + 1: len(data)] = quick_sort(data[r + 1: len(data)])
+        data[0: l] = quick_sort(data[0: l], progress_callback)
+        data[r + 1: len(data)] = quick_sort(data[r + 1: len(data)], progress_callback)
 
     return data
 
 
-def heap_sort(data: list):
+def heap_sort(data: list, progress_callback=None):
     """
     Heap sort.
+    :param progress_callback:
+    :param progress_callback:
     :param data:
     :return:
     """
+    progress = 0
+    total = len(data) // 2 + len(data)
     for i in range(len(data) // 2 - 1, -1, -1):
         data = adjust_heap(data, i, len(data) - 1)
+        progress += 1
+        if progress_callback is not None:
+            progress_callback(progress, total)
 
-    for i in range(int(len(data)) - 1, 0, -1):
+    for i in range(len(data) - 1, 0, -1):
         data[0], data[i] = data[i], data[0]
         data = adjust_heap(data, 0, i - 1)
+        progress += 1
+        if progress_callback is not None:
+            progress_callback(progress, total)
 
     return data
 
@@ -134,26 +175,33 @@ def adjust_heap(data: list, root: int, end: int):
     return data
 
 
-def shell_sort(data: list):
+def shell_sort(data: list, progress_callback=None):
     """
     Shell sort.
+    :param progress_callback:
     :param data:
     :return:
     """
     k = len(data) // 2
+    progress = 0
+    total = int(math.log(len(data), 2))
     while k > 0:
         for i in range(k, len(data)):
             while i >= k and data[i] < data[i - k]:
                 data[i], data[i - k] = data[i - k], data[i]
                 i -= k
+        progress += 1
+        if progress_callback is not None:
+            progress_callback(progress, total)
         k //= 2
 
     return data
 
 
-def counting_sort(data: list):
+def counting_sort(data: list, progress_callback=None):
     """
     Counting sort.
+    :param progress_callback:
     :param data:
     :return:
     """
@@ -162,29 +210,38 @@ def counting_sort(data: list):
     bucket = [0] * (max_value - min_value + 1)
     new_data = [0] * len(data)
     index = 0
-
+    progress = 0
+    total = len(data) * 2
     for i in range(len(data)):
         bucket[data[i] - min_value] += 1
+        progress += 1
+        if progress_callback is not None:
+            progress_callback(progress, total)
 
     for i in range(len(bucket)):
         for j in range(bucket[i]):
             new_data[index] = i + min_value
             index += 1
+            progress += 1
+        if progress_callback is not None:
+            progress_callback(progress, total)
 
     return new_data
 
 
-def radix_sort(data: list):
+def radix_sort(data: list, progress_callback=None):
     """
     Radix sort.
+    :param progress_callback:
     :param data:
     :return:
     """
     max_value = max(data)
     bucket = [[] for i in range(10)]
-
     digit_number = len(str(max_value))
     i = 1
+    progress = 0
+    total = digit_number
     while i <= digit_number:
         for j in data:
             bucket[j % (10 ** i) // (10 ** (i - 1))].append(j)
@@ -195,11 +252,15 @@ def radix_sort(data: list):
         bucket = [[] for i in range(10)]
 
         i += 1
+        progress += 1
+
+        if progress_callback is not None:
+            progress_callback(progress, total)
 
     return data
 
 
-def check(data: list, length: int):
+def check(data: list):
     """
     To check the data is sorted or not.
     :param data:
@@ -216,11 +277,14 @@ def check(data: list, length: int):
 
 
 def main():
-    d = list(np.random.randint(0, 1000, 1000))
-    d = quick_sort(list(d))
+    def p(i, j):
+        print(i, j)
+
+    d = list(np.random.randint(0, 1000, 10000))
+    d = shell_sort(list(d), p)
     print(d)
 
-    print(check(d, len(d)))
+    print(check(d))
 
 
 if __name__ == '__main__':
