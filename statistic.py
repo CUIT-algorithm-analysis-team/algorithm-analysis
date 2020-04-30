@@ -2,8 +2,12 @@ from sort_algorithm import *
 from dataset import *
 import time
 from functools import wraps
+import psutil
+import gc
 
-sorted_algorithms = {select_sort:"select_sort",bubble_sort:"bubble_sort"}
+sorted_algorithms = {selection_sort:"selection_sort",bubble_sort:"bubble_sort",insertion_sort:"insertion_sort",\
+                     merge_sort:"merge_sort",quick_sort:"quick_sort",heap_sort:"heap_sort",shell_sort:"shell_sort",\
+                     counting_sort:"counting_sort",radix_sort:"radix_sort"} #
 
 class algorithm_analysis:
     def __init__(self,_sort_algorithms):
@@ -29,9 +33,22 @@ class algorithm_analysis:
                 result = sort_fun(l)
                 t1 = time.time()
                 self.costed_time[self.sort_algorithms[sort_fun]].append(t1 - t0)
+    def test_space(self,n):
+        """
+        和时间一样测试算法所用的空间
+        :param n: 数据规模
+        :return:  数据保存到 costed_space 里面
+        """
+        p = psutil.Process()  # 获取当前进程
+        for sort_fun in list(self.sort_algorithms.keys()):
+            for l in dataset.load_data(n):
+                result = sort_fun(l)
+                t_mem = p.memory_info().wset
+                self.costed_space[self.sort_algorithms[sort_fun]].append(t_mem)
+                gc.collect()
 
 if __name__ == '__main__':
     a = algorithm_analysis(sorted_algorithms)
-    a.test_time(1000)
-    for func_name , cost_time in a.costed_time.items():
-        print(func_name,cost_time[-5:])
+    a.test_space(500)
+    for func_name , costed_space in a.costed_space.items():
+        print(func_name,costed_space[-10:])

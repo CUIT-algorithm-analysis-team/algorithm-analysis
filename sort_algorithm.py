@@ -270,7 +270,6 @@ def check(data: list):
     :param length:
     :return:
     """
-
     is_sorted = True
     for i in range(len(data) - 1):
         if data[i] > data[i + 1]:
@@ -282,14 +281,14 @@ def check(data: list):
 def main():
     # i: progress, j: total_progress, k: memory
     def p(i, j, k):
-        print(k)
+        print(k / 1024)
         # print(i, j)
         a = 0
     print(psutil.Process(os.getpid()).memory_info().rss / 1024 / 1024)
     d = list(np.random.randint(0, 1000, 100000))
     d = merge_sort(list(d), p)
-    print(d)
-    print(check(d))
+    # print(d)
+    # print(check(d))
     print(psutil.Process(os.getpid()).memory_info().rss / 1024 / 1024)
 
 

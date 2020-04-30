@@ -6,21 +6,6 @@ class dataset():
         :param n:数据的规模
         """
         self.datapath = "data"
-
-    def create_dataset(self,n):
-        """
-        生成数据，保存到txt中，至于到底要不要保存到txt,还是直接生成,后面可以讨论
-        :param n: n 个数量集合的数据。
-        :return: 向文件中保存 固定格式的 txt
-        """
-        for i in range(1,n + 1):
-            filename = self.datapath + "/" + str(i) + ".txt"
-            with open(filename,'w') as f:
-                l = [str(j) for j in range(i)]
-                shuffle(l)
-                sep = ','
-                f.write(sep.join(l))
-                f.close()
     @staticmethod
     def load_data(n):
         '''
@@ -29,7 +14,7 @@ class dataset():
         :return:
         '''
         for i in range(1,n + 1):
-            l = [str(j) for j in range(i)]
+            l = [j for j in range(i)]
             shuffle(l)
             yield l
 
@@ -41,7 +26,7 @@ class dataset():
         :return:
         '''
         for i in range(1,n + 1):
-            l = [str(j) for j in range(i)]
+            l = [j for j in range(i)]
             yield l
 
     @staticmethod
@@ -52,7 +37,7 @@ class dataset():
         :return:
         '''
         for i in range(1, n + 1):
-            l = [str(j) for j in range(i)].reverse()
+            l = [j for j in range(i)].reverse()
             yield l
 
 if __name__ == '__main__':
