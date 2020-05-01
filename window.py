@@ -3,6 +3,8 @@ from tkinter import ttk
 from tkinter import Canvas
 from statistic import sorted_algorithms
 import time
+import PIL
+from PIL import ImageTk
 
 window = tk.Tk()
 
@@ -76,5 +78,41 @@ fill_rec = canvas.create_rectangle(5, 5, 5, 25, outline="", width=0, fill="blue"
 l = tk.Label(frame_propression, textvariable=x)
 seplit5=ttk.Separator(window,orient='horizontal')  ##这是分割线
 seplit5.pack(fill=tk.X)
+
+frame_tag = tk.Frame(window)
+frame_tag.pack(fill=tk.Y, pady=10)
+tag = tk.IntVar()
+tagWidth = 23
+tk.Radiobutton(frame_tag, text="运行时间", command=lambda:changeTag(0), width=tagWidth, variable=tag, value=0, bd=1,
+               indicatoron=0).grid(column=0, row=1)
+tk.Radiobutton(frame_tag, text="使用空间", command=lambda:changeTag(1), variable=tag, width=tagWidth, value=1, bd=1,
+               indicatoron=0).grid(column=1, row=1)
+tk.Radiobutton(frame_tag, text="时间复杂度", command=lambda:changeTag(2), variable=tag, width=tagWidth, value=2, bd=1,
+               indicatoron=0).grid(column=2, row=1)
+# Change tag
+def changeTag(tag):
+    frame_time.pack_forget()
+    frame_space.pack_forget()
+    frame_regress.pack_forget()
+    if tag == 0:
+        frame_time.pack(fill=tk.X)
+    elif tag == 1:
+        frame_space.pack(fill=tk.X)
+    elif tag == 2:
+        frame_regress.pack(fill=tk.X)
+
+# frame_time --> 时间显示
+frame_time = tk.Frame(window, height=300, bg="red")
+frame_time.pack(side=tk.TOP, fill=tk.X)
+im=PIL.Image.open("plottext.png")
+im = im.resize((500, 300),PIL.Image.ANTIALIAS)
+img=ImageTk.PhotoImage(im)
+imLabel=tk.Label(frame_time,image=img).pack() # 显示图片
+#frame_space --> 空间显示
+frame_space = tk.Frame(window, height=350, bg="blue")
+frame_space.pack(side=tk.TOP, fill=tk.X)
+# frame5 --> 回归分析
+frame_regress = tk.Frame(window, height=350, bg="yellow")
+frame_regress.pack(side=tk.TOP, fill=tk.X)
 
 window.mainloop()
