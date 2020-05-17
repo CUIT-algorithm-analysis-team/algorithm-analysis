@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def drawCostTime(costed_time,n):
+def drawCostTime(costed_time,n,imgname):
     """
     绘制曲线图
     :param costed_time : 算法和时间对应的字典类型
@@ -15,3 +15,4 @@ def drawCostTime(costed_time,n):
         plt.plot(x,time,label=func_name)
     plt.legend()
     plt.show()
+    plt.savefig(imgname)  #尝试保存图片

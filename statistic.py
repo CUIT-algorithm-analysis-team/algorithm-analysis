@@ -20,15 +20,24 @@ class algorithm_analysis:
         for name in list(self.sort_algorithms.values()):
             self.costed_time[name] = []
             self.costed_space[name] = []
-    def test_time(self,n):
+    def test_time(self,n,datastyle):
         """
         测试各个算法所用的时间
         :param n: 数据的规模
         :return: 数据保存再costed_time 里面
         """
         #TODO :后面可以整个进度条
+        #选择数据产生方式
+        data_loader = dataset.load_data
+        if datastyle == "out_order":
+            data_loader = dataset.load_data
+        elif datastyle == "order":
+            data_loader = dataset.load_order_data
+        else:
+            data_loader = dataset.load_reorder_data
+
         for sort_fun in list(self.sort_algorithms.keys()):
-            for l in dataset.load_data(n):
+            for l in data_loader(n):
                 t0 = time.time()
                 result = sort_fun(l)
                 t1 = time.time()
@@ -49,6 +58,6 @@ class algorithm_analysis:
 
 if __name__ == '__main__':
     a = algorithm_analysis(sorted_algorithms)
-    a.test_space(500)
-    for func_name , costed_space in a.costed_space.items():
-        print(func_name,costed_space[-10:])
+    a.test_time(500,"order")
+    for func_name , costed_time in a.costed_time.items():
+        print(func_name,costed_time[-10:])
