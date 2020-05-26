@@ -11,6 +11,12 @@ from tkinter import *
 from tkinter.messagebox import *
 from PIL import Image, ImageTk
 
+imageshow = None
+imageregress = None
+
+
+
+
 class MainPage(object):
     def __init__(self, master=None):
         self.root = master #定义内部变量root
@@ -108,15 +114,15 @@ class regressFrame(Frame):  # 继承Frame类
         self.xVariable = StringVar()
         self.imnames = []
         self.createPage()
+
+
     def showfun(self):
-        ##将选中的图片绘制到界面上去
-        imname = self.com.get()  # 当前选中的图片的名字
-        canvas = Canvas(self,
-                        width=300,
-                        height=300)
-        canvas.pack()
-        img = PhotoImage(file=imname)
-        canvas.create_image(0, 0, anchor=NW, image=img)
+        imname = self.com.get()
+        global imageshow
+        imageshow = tk.PhotoImage(file=imname)
+        image_label = tk.Label(self, image=imageshow)
+        image_label.pack()
+
         # img_open = Image.open(imname)
         # img_png = ImageTk.PhotoImage(img_open)
         # label_img = tk.Label(self, image=img_png)
@@ -280,5 +286,8 @@ class progress_bar():
             self.x.set("完成")
 
 if __name__ == '__main__':
-    mi = MainPage(tk.Tk())
+    mi = MainPage(tk.Tk())#
+    # imageshow = tk.PhotoImage(file="merge_sort_quick_sort_10_out_order.png")
+    # image_label = tk.Label(mi, image=imageshow)
+    # image_label.pack()
     mi.root.mainloop()

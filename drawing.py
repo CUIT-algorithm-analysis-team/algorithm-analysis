@@ -14,5 +14,4 @@ def drawCostTime(costed_time,n,imgname):
     for func_name ,time in costed_time.items():
         plt.plot(x,time,label=func_name)
     plt.legend()
-    plt.show()
     plt.savefig(imgname)  #尝试保存图片
