@@ -41,6 +41,7 @@ def regression(lst_time, lst_size):
 
     return out
 
+
 if __name__ == '__main__':
     from dataset import dataset
     from sort_algorithm import *
@@ -65,4 +66,3 @@ if __name__ == '__main__':
     plt.legend(["GroundTurth", out['type']])
     plt.show()
     print(f"Cost is {out['cost']}\nParam is {out['param']}")
-
