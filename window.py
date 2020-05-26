@@ -121,7 +121,7 @@ class regressFrame(Frame):  # 继承Frame类
         global imageshow
         imageshow = tk.PhotoImage(file=imname)
         image_label = tk.Label(self, image=imageshow)
-        image_label.pack()
+        image_label.pack(side=BOTTOM)
 
         # img_open = Image.open(imname)
         # img_png = ImageTk.PhotoImage(img_open)
