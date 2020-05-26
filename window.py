@@ -9,7 +9,7 @@ from PIL import ImageTk
 from drawing import *
 from tkinter import *
 from tkinter.messagebox import *
-
+from PIL import Image, ImageTk
 
 class MainPage(object):
     def __init__(self, master=None):
@@ -41,7 +41,7 @@ class MainPage(object):
     def regressData(self):
         self.selectPage.pack_forget_all()
         imnames = self.selectPage.run_botton.imnames;
-        self.regressPage.getimnames(imnames)   #获取select 的操作
+        self.regressPage.getimnames(imnames)   #更新文件名
         self.regressPage.pack_all()
         self.countPage.pack_forget()
         self.aboutPage.pack_forget()
@@ -108,23 +108,48 @@ class regressFrame(Frame):  # 继承Frame类
         self.xVariable = StringVar()
         self.imnames = []
         self.createPage()
+    def showfun(self):
+        ##将选中的图片绘制到界面上去
+        imname = self.com.get()  # 当前选中的图片的名字
+        canvas = Canvas(self,
+                        width=300,
+                        height=300)
+        canvas.pack()
+        img = PhotoImage(file=imname)
+        canvas.create_image(0, 0, anchor=NW, image=img)
+        # img_open = Image.open(imname)
+        # img_png = ImageTk.PhotoImage(img_open)
+        # label_img = tk.Label(self, image=img_png)
+        # label_img.pack()
+
     def createPage(self):
         self.com = ttk.Combobox(self, textvariable=self.xVariable, width=400)  # #创建下拉菜单
         self.com["value"] = self.imnames  # #给下拉菜单设定值
+        self.bu_frame = ttk.Frame(self)
+        self.show_bn = ttk.Button(self.bu_frame,text='show',command=self.showfun)
+        self.regess_bn = ttk.Button(self.bu_frame,text='regress')
         self.com.pack()
+        self.show_bn.pack( pady=10, side=LEFT)
+        self.regess_bn.pack( pady=10, side=LEFT)
+        self.bu_frame.pack()
         #com.current(0)  #
-        #com.bind("<<ComboboxSelected>>", self.drawfun)
+
     def getimnames(self,imnames_):
         self.imnames = imnames_
+        self.com["value"] = self.imnames  # #给下拉菜单设定值
+        self.com.update()
     def pack_all(self):
         self.com.pack()
+        self.show_bn.pack(pady=10, side=LEFT)
+        self.regess_bn.pack(pady=10, side=LEFT)
+        self.bu_frame.pack()
         self.pack()
     def pack_forget_all(self):
         self.com.pack_forget()
+        self.regess_bn.pack_forget()
+        self.show_bn.pack_forget()
+        self.bu_frame.pack_forget()
         self.pack_forget()
-
-
-
 
 class CountFrame(Frame):  # 继承Frame类
     def __init__(self, master=None):
@@ -154,12 +179,12 @@ class number_box():
         self.e1.pack(side="right")
         self.l.pack(side="left")
 
-
 class select_window():
     def __init__(self, master=None):
         self.root = master
         self.frame_selected = tk.Frame(self.root)
         listname = list(sorted_algorithms.values())  ##获取函数名字
+        group = tk.LabelFrame(self.frame_selected, text='请选中要运行的算法')
         self.checkVardict = {}
         for name in listname:
             self.checkVardict[name] = tk.IntVar(value=0)
@@ -167,8 +192,9 @@ class select_window():
         for i in range(3):
             for j in range(3):
                 var = self.checkVardict[listname[i * 3 + j]]
-                tk.Checkbutton(self.frame_selected, text=listname[i * 3 + j],variable=var,onvalue=1,offvalue=0).grid(row=i, column=j, padx=10, pady=10,
+                tk.Checkbutton(group, text=listname[i * 3 + j],variable=var,onvalue=1,offvalue=0).grid(row=i, column=j, padx=10, pady=10,
                                                                                    ipadx=10, ipady=10)
+        group.pack()
 class data_style_box():
     def __init__(self,master):
         self.root = master
@@ -216,6 +242,7 @@ class run_botton():
         a = algorithm_analysis(self.selected_dict)
         n = int(self.num.get())
         a.test_time(n,self.datastyle.get())  #计算运行的时间
+        #a.test_space(n,self.datastyle.get())
         try:
             ##把图片画回去
             drawCostTime(a.costed_time,int(self.num.get()),self.imnames[-1])
