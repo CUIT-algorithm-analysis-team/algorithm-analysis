@@ -34,7 +34,7 @@ class MainPage(object):
         self.root['menu'] = menubar  # 设置菜单栏
     def selectData(self):
         self.selectPage.pack_all()
-        self.regressPage.pack_forget()
+        self.regressPage.pack_forget_all()
         self.countPage.pack_forget()
         self.aboutPage.pack_forget()
 
@@ -42,20 +42,19 @@ class MainPage(object):
         self.selectPage.pack_forget_all()
         imnames = self.selectPage.run_botton.imnames;
         self.regressPage.getimnames(imnames)   #获取select 的操作
-        self.regressPage.pack()
-        self.regressPage.createPage()
+        self.regressPage.pack_all()
         self.countPage.pack_forget()
         self.aboutPage.pack_forget()
 
     def countData(self):
-        self.selectPage.pack_forget()
-        self.regressPage.pack_forget()
+        self.selectPage.pack_forget_all()
+        self.regressPage.pack_forget_all()
         self.countPage.pack()
         self.aboutPage.pack_forget()
 
     def aboutDisp(self):
-        self.selectPage.pack_forget()
-        self.regressPage.pack_forget()
+        self.selectPage.pack_forget_all()
+        self.regressPage.pack_forget_all()
         self.countPage.pack_forget()
         self.aboutPage.pack()
 
@@ -64,7 +63,7 @@ class selectFrame(Frame):  # 继承Frame类
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.root = master  # 定义内部变量root
-        self.imnames = [] #用于存储运行的的结果图
+        self.imnames = [] #用于存储运行的的结果图的名字
         self.createPage()
     def createPage(self):
         self.select = select_window(self.root)
@@ -108,20 +107,23 @@ class regressFrame(Frame):  # 继承Frame类
         self.root = master  # 定义内部变量root
         self.xVariable = StringVar()
         self.imnames = []
-        #self.createPage()
-
-
+        self.createPage()
     def createPage(self):
-        com = ttk.Combobox(self, textvariable=self.xVariable,width = 400)  # #创建下拉菜单
-        #从
-        com["value"] = self.imnames #("河北", "河南", "山东")  # #给下拉菜单设定值
-        #com.current(0)  # #设定下拉菜单的默认值为第3个，即山东
-        com.pack()
-        Label(self, text='显示和回归界面').pack()
+        self.com = ttk.Combobox(self, textvariable=self.xVariable, width=400)  # #创建下拉菜单
+        self.com["value"] = self.imnames  # #给下拉菜单设定值
+        self.com.pack()
+        #com.current(0)  #
         #com.bind("<<ComboboxSelected>>", self.drawfun)
-
     def getimnames(self,imnames_):
         self.imnames = imnames_
+    def pack_all(self):
+        self.com.pack()
+        self.pack()
+    def pack_forget_all(self):
+        self.com.pack_forget()
+        self.pack_forget()
+
+
 
 
 class CountFrame(Frame):  # 继承Frame类
