@@ -249,6 +249,23 @@ class run_botton():
         n = int(self.num.get())
         a.test_time(n,self.datastyle.get())  #计算运行的时间
         #a.test_space(n,self.datastyle.get())
+        # 调用进度条
+        temp = 0
+        for name, value in self.checkVardict.items():
+            if value.get() == 1:
+                temp = max(a.costed_time[name])
+                break
+        temp = 1 / temp
+        p_bar = progress_bar
+        # 填充进度
+        for i in range(int(temp)):
+            time.sleep(0.1)
+            p_bar.change_schedule(1, i, temp-1)
+        # 清空进度条
+        for i in range(int(temp)):
+            time.sleep(0)
+            p_bar.change_schedule(0, i, temp - 1)
+            
         try:
             ##把图片画回去
             drawCostTime(a.costed_time,int(self.num.get()),self.imnames[-1])
@@ -278,12 +295,16 @@ class progress_bar():
         self.out_rec = self.canvas.create_rectangle(5, 5, 105, 25, outline="blue", width=1)
         self.fill_rec = self.canvas.create_rectangle(5, 5, 5, 25, outline="", width=0, fill="blue")
         self.l = tk.Label(self.frame_propression, textvariable=self.x)
-    def change_schedule(self,now_schedule,all_schedule):
-        self.canvas.coords(self.fill_rec, (5, 5, 6 + (now_schedule/all_schedule)*100, 25))
-        self.root.update()
-        self.x.set(str(round(now_schedule/all_schedule*100,2)) + '%')
-        if round(now_schedule/all_schedule*100,2) == 100.00:
-            self.x.set("完成")
+        def change_schedule(self, flag, now_schedule,all_schedule):
+            if flag == 1:
+                self.canvas.coords(self.fill_rec, (5, 5, 6 + (now_schedule/all_schedule)*100, 25))
+                self.root.update()
+                self.x.set(str(round(now_schedule/all_schedule*100,2)) + '%')
+                if round(now_schedule/all_schedule*100,2) == 100.00:
+                    self.x.set("完成")
+            else:
+                self.canvas.coords(self.fill_rec1, (5, 5, 6 + (now_schedule / all_schedule) * 100, 25))
+                self.root.update()
 
 if __name__ == '__main__':
     mi = MainPage(tk.Tk())#
