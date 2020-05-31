@@ -14,9 +14,6 @@ from PIL import Image, ImageTk
 imageshow = None
 imageregress = None
 
-
-
-
 class MainPage(object):
     def __init__(self, master=None):
         self.root = master #定义内部变量root
@@ -79,7 +76,6 @@ class selectFrame(Frame):  # 继承Frame类
         self.styledata = data_style_box(self.root)  # 数据类型
         self.seplitline3 = seplit_line(self.root)
         self.run_botton = run_botton(self.root, self.select.checkVardict, self.numbox.n, self.styledata.var)
-        self.bar = progress_bar(self.root)
 
     def pack_all(self):
         self.select.frame_selected.pack()
@@ -89,8 +85,6 @@ class selectFrame(Frame):  # 继承Frame类
         self.styledata.frame_data_style.pack()
         self.seplitline3.seplit1.pack()
         self.run_botton.runbutton.pack()
-        self.bar.frame_propression.pack()
-        self.bar.canvas.pack()
         self.pack()
 
 
@@ -99,13 +93,11 @@ class selectFrame(Frame):  # 继承Frame类
         self.imnames = self.run_botton.imnames; #将值更新回去
         self.seplitline1.seplit1.pack_forget()
         self.numbox.frame_input_n.pack_forget()
-        self.pack_forget()
         self.seplitline2.seplit1.pack_forget()
         self.styledata.frame_data_style.pack_forget()
         self.seplitline3.seplit1.pack_forget()
         self.run_botton.runbutton.pack_forget()
-        self.bar.frame_propression.pack_forget()
-        self.bar.canvas.pack_forget()
+        self.pack_forget()
 
 class regressFrame(Frame):  # 继承Frame类
     def __init__(self, master=None,):
@@ -136,8 +128,8 @@ class regressFrame(Frame):  # 继承Frame类
         self.regess_bn = ttk.Button(self.bu_frame,text='regress')
         self.com.pack()
         self.show_bn.pack( pady=10, side=LEFT)
-        self.regess_bn.pack( pady=10, side=LEFT)
-        self.bu_frame.pack()
+        # self.regess_bn.pack( pady=10, side=LEFT)
+        # self.bu_frame.pack()
         #com.current(0)  #
 
     def getimnames(self,imnames_):
@@ -231,6 +223,7 @@ class run_botton():
         self.selected_dict = {}
         self.imnames = []  #用于保存生成的图片的名字
         self.runbutton = tk.Button(self.root, text='RUN', font=('Arial', 12), width=10, height=1, command=self.run)
+
     def run(self):  #只是测试一下
         #生成图片的名字
         ls = ""
@@ -247,25 +240,19 @@ class run_botton():
                 self.selected_dict[func] = name
         a = algorithm_analysis(self.selected_dict)
         n = int(self.num.get())
-        a.test_time(n,self.datastyle.get())  #计算运行的时间
-        #a.test_space(n,self.datastyle.get())
-        # 调用进度条
-        temp = 0
-        for name, value in self.checkVardict.items():
-            if value.get() == 1:
-                temp = max(a.costed_time[name])
-                break
-        temp = 1 / temp
-        p_bar = progress_bar
-        # 填充进度
-        for i in range(int(temp)):
-            time.sleep(0.1)
-            p_bar.change_schedule(1, i, temp-1)
-        # 清空进度条
-        for i in range(int(temp)):
-            time.sleep(0)
-            p_bar.change_schedule(0, i, temp - 1)
-            
+
+        popup = tk.Toplevel()
+        tk.Label(popup, text="程序正在运行").grid(row=0, column=0)
+        progress = 0
+        progress_var = tk.DoubleVar()
+        progress_bar = ttk.Progressbar(popup, variable=progress_var, maximum=len(list(a.sort_algorithms.keys())) - 1)
+        progress_bar.grid(row=1, column=0)  # .pack(fill=tk.X, expand=1, side=tk.BOTTOM)
+        popup.pack_slaves()
+        for i in a.test_time(n,self.datastyle.get()):        #计算运行的时间
+            popup.update()
+            progress = i;
+            progress_var.set(progress)
+
         try:
             ##把图片画回去
             drawCostTime(a.costed_time,int(self.num.get()),self.imnames[-1])
@@ -282,29 +269,6 @@ class run_botton():
         ls += "the datastyle %s\n"%self.datastyle.get()
         messagebox.showinfo(title='不知道起什么', message=ls)
 
-class progress_bar():
-    def __init__(self,master):
-        # 进度条
-        # 更新进度条函数
-        # 创建画布
-        self.root = master
-        self.frame_propression = tk.Frame(self.root)  # 使用时将框架根据情况选择新的位置
-        self.canvas = Canvas(self.frame_propression, width=120, height=30, bg="white")
-        self.x = tk.StringVar()
-        # 进度条以及完成程度
-        self.out_rec = self.canvas.create_rectangle(5, 5, 105, 25, outline="blue", width=1)
-        self.fill_rec = self.canvas.create_rectangle(5, 5, 5, 25, outline="", width=0, fill="blue")
-        self.l = tk.Label(self.frame_propression, textvariable=self.x)
-        def change_schedule(self, flag, now_schedule,all_schedule):
-            if flag == 1:
-                self.canvas.coords(self.fill_rec, (5, 5, 6 + (now_schedule/all_schedule)*100, 25))
-                self.root.update()
-                self.x.set(str(round(now_schedule/all_schedule*100,2)) + '%')
-                if round(now_schedule/all_schedule*100,2) == 100.00:
-                    self.x.set("完成")
-            else:
-                self.canvas.coords(self.fill_rec1, (5, 5, 6 + (now_schedule / all_schedule) * 100, 25))
-                self.root.update()
 
 if __name__ == '__main__':
     mi = MainPage(tk.Tk())#
