@@ -165,7 +165,15 @@ class AboutFrame(Frame):  # 继承Frame类
         self.root = master  # 定义内部变量root
         self.createPage()
     def createPage(self):
-        Label(self, text='关于界面').pack()
+        Label(self, text='关于界面\n本系统主要分为了四个页面，分别是：数据录入、显示和回归、统计和关于。\n'
+                         '在数据录入页面，用户可以选择一个或者多个想要运行的排序算法，并输入数\n'
+                         '据规模和数据显示规则，点击"RUN"按钮，将会显示出所选择的算法根据要求\n'
+                         '的输出规则所需的时间曲线。'
+                         '在显示和回归页面，用户可以在页面顶部的选择\n'
+                         '想要展示的排序算法的时间复杂度拟合的曲线图像。在统计页面，将展示"显示\n'
+                         '和回归"中的回归分析所生成的返回结果报告。在关于页面，即本页面，主要用\n'
+                         '于展示说明本系统的各项功能和使用方法。', font=('Arial', 12), height =10).pack()
+        
 
 class number_box():
     def __init__(self,master):
