@@ -174,7 +174,6 @@ class AboutFrame(Frame):  # 继承Frame类
                          '和回归"中的回归分析所生成的返回结果报告。在关于页面，即本页面，主要用\n'
                          '于展示说明本系统的各项功能和使用方法。', font=('Arial', 12), height =10).pack()
         
-
 class number_box():
     def __init__(self,master):
         self.root = master
