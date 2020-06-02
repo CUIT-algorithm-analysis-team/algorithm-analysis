@@ -9,7 +9,9 @@ sorted_algorithms = {selection_sort:"selection_sort",bubble_sort:"bubble_sort",i
                      merge_sort:"merge_sort",quick_sort:"quick_sort",heap_sort:"heap_sort",shell_sort:"shell_sort",\
                      counting_sort:"counting_sort",radix_sort:"radix_sort"} #
 
+
 class algorithm_analysis:
+
     def __init__(self,_sort_algorithms):
         """
         :param _sort_algorithms: 排序算法的列表
@@ -17,10 +19,13 @@ class algorithm_analysis:
         self.sort_algorithms = _sort_algorithms         #各个算法的名字
         self.costed_time = {}                            #用于存储算法对应的时间
         self.costed_space = {}                          #用于存储算法对应的空间
+        self.question_size = {}
         for name in list(self.sort_algorithms.values()):
             self.costed_time[name] = []
             self.costed_space[name] = []
-    def test_time(self,n,datastyle):
+            self.question_size[name] = []
+
+    def test_time(self, n, start, step, datastyle):
         """
         测试各个算法所用的时间
         :param n: 数据的规模
@@ -36,12 +41,13 @@ class algorithm_analysis:
         else:
             data_loader = dataset.load_reorder_data
 
-        for i , sort_fun in enumerate(list(self.sort_algorithms.keys())):
-            for l in data_loader(n):
+        for i, sort_fun in enumerate(list(self.sort_algorithms.keys())):
+            for l in data_loader(n, start, step):
                 t0 = time.time()
                 result = sort_fun(l)
                 t1 = time.time()
                 self.costed_time[self.sort_algorithms[sort_fun]].append(t1 - t0)
+                self.question_size[self.sort_algorithms[sort_fun]].append(len(l))
                 yield i
 
     def test_space(self,n):
