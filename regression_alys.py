@@ -35,6 +35,7 @@ class RegressionHelper():
                 out[item]['cost'] = round(nlogn['cost'], 6)
                 out[item]['pred'] = pred_time_nlogn.tolist()
                 out[item]['groundtruth'] = self.costed_time[item]
+                out[item]['size'] = self.question_size[item]
                 out[item]['param'] = (nlogn['x'][0], nlogn['x'][1])
             else:
                 pred_time_n2 = n2['x'][0] * np.power(np.array(self.question_size[item]), 2) + n2['x'][1]
@@ -42,6 +43,7 @@ class RegressionHelper():
                 out[item]['cost'] = round(n2['cost'], 6)
                 out[item]['pred'] = pred_time_n2.tolist()
                 out[item]['groundtruth'] = self.costed_time[item]
+                out[item]['size'] = self.question_size[item]
                 out[item]['param'] = (n2['x'][0], n2['x'][1])
 
         self.result = out
