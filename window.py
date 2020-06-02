@@ -11,6 +11,10 @@ from tkinter import *
 from tkinter.messagebox import *
 from PIL import Image, ImageTk
 
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.figure import Figure
+from  regression_alys import RegressionHelper
+
 imageshow = None
 imageregress = None
 
@@ -18,14 +22,16 @@ class MainPage(object):
     def __init__(self, master=None):
         self.root = master #定义内部变量root
         self.root.title("algorithm-analysis")
-        self.root.geometry('%dx%d' % (600, 400)) #设置窗口大小
+        self.root.geometry('%dx%d' % (800, 600)) #设置窗口大小
         self.imnames = []  #运行的图片结果的名字
+        self.data_trans = DataTrans()
         self.createPage()
+
 
     def createPage(self):
         # 创建不同Frame
-        self.selectPage = selectFrame(self.root)  #算法的选择窗口
-        self.regressPage = regressFrame(self.root)  #显示和回归分析窗口
+        self.selectPage = selectFrame(self.root, data_trans=self.data_trans)  #算法的选择窗口
+        self.regressPage = regressFrame(self.root, data_trans=self.data_trans)  #显示和回归分析窗口
         self.countPage = CountFrame(self.root)    #统计窗口
         self.aboutPage = AboutFrame(self.root)    #相关窗口
         self.selectPage.pack_all()  # 默认显示数据录入界面
@@ -63,10 +69,11 @@ class MainPage(object):
 
 
 class selectFrame(Frame):  # 继承Frame类
-    def __init__(self, master=None):
+    def __init__(self, master=None, data_trans=None):
         Frame.__init__(self, master)
         self.root = master  # 定义内部变量root
         self.imnames = [] #用于存储运行的的结果图的名字
+        self.data_trans = data_trans
         self.createPage()
     def createPage(self):
         self.select = select_window(self.root)
@@ -75,7 +82,8 @@ class selectFrame(Frame):  # 继承Frame类
         self.seplitline2 = seplit_line(self.root)
         self.styledata = data_style_box(self.root)  # 数据类型
         self.seplitline3 = seplit_line(self.root)
-        self.run_botton = run_botton(self.root, self.select.checkVardict, self.numbox.n, self.styledata.var)
+        self.run_botton = run_botton(self.root, self.select.checkVardict, self.numbox.n, self.numbox.start,
+                                     self.numbox.step, self.styledata.var, self.data_trans)
 
     def pack_all(self):
         self.select.frame_selected.pack()
@@ -100,20 +108,58 @@ class selectFrame(Frame):  # 继承Frame类
         self.pack_forget()
 
 class regressFrame(Frame):  # 继承Frame类
-    def __init__(self, master=None,):
+    def __init__(self, master=None, data_trans=None):
         Frame.__init__(self, master)
         self.root = master  # 定义内部变量root
         self.xVariable = StringVar()
         self.imnames = []
+        self.data_trans = data_trans
         self.createPage()
+        self.createCanvas()
+
+    def createCanvas(self):
+        self.fig = Figure(figsize=(5, 4), dpi=100)
+        self.canvas = FigureCanvasTkAgg(self.fig, self)
+        self.canvas.get_tk_widget().pack(side=tk.BOTTOM)
+
+        toolbar = NavigationToolbar2Tk(self.canvas, self)
+        toolbar.update()
+
+    def showChart(self, data):
+        fig = self.fig
+        canvas=self.canvas
+        fig.clear()
+
+        ax = fig.add_subplot(111)
+
+        for item in data.keys():
+            ax.plot(data[item]['size'], data[item]['groundtruth'], label=f'{item}')
+            ax.plot(data[item]['size'], data[item]['pred'], label=f'{item}_pred')
+
+        ax.legend()
+        canvas.draw()
 
 
     def showfun(self):
-        imname = self.com.get()
-        global imageshow
-        imageshow = tk.PhotoImage(file=imname)
-        image_label = tk.Label(self, image=imageshow)
-        image_label.pack(side=BOTTOM)
+        data = self.data_trans.get_data()
+
+        fig = self.fig
+        canvas = self.canvas
+        fig.clear()
+
+        ax = fig.add_subplot(111)
+
+        for item in data.sort_algorithms.values():
+            ax.plot(data.question_size[item], data.costed_time[item], label=f'{item}')
+
+        ax.legend()
+        canvas.draw()
+
+        # imname = self.com.get()
+        # global imageshow
+        # imageshow = tk.PhotoImage(file=imname)
+        # image_label = tk.Label(self, image=imageshow)
+        # image_label.pack(side=BOTTOM)
 
         # img_open = Image.open(imname)
         # img_png = ImageTk.PhotoImage(img_open)
@@ -125,12 +171,19 @@ class regressFrame(Frame):  # 继承Frame类
         self.com["value"] = self.imnames  # #给下拉菜单设定值
         self.bu_frame = ttk.Frame(self)
         self.show_bn = ttk.Button(self.bu_frame,text='show',command=self.showfun)
-        self.regess_bn = ttk.Button(self.bu_frame,text='regress')
+        self.regess_bn = ttk.Button(self.bu_frame,text='regress', command=self.regression_alys)
         self.com.pack()
         self.show_bn.pack( pady=10, side=LEFT)
         # self.regess_bn.pack( pady=10, side=LEFT)
         # self.bu_frame.pack()
         #com.current(0)  #
+
+    def regression_alys(self):
+        data = self.data_trans.get_data()
+        helper = RegressionHelper(data)
+        result = helper.regression()
+        self.showChart(data=result)
+
 
     def getimnames(self,imnames_):
         self.imnames = imnames_
@@ -179,10 +232,21 @@ class number_box():
         self.root = master
         self.frame_input_n = tk.Frame(self.root)
         self.n = tk.StringVar(value=10000)
+        self.start = tk.StringVar(value=100)
+        self.step = tk.StringVar(value=100)
         self.l = tk.Label(self.frame_input_n, text='请输入数据规模n:', font=('Arial', 12), height=2)
-        self.e1 = tk.Entry(self.frame_input_n, show=None, font=('Arial', 14), textvariable=self.n)  # 输入框
-        self.e1.pack(side="right")
+        self.e1 = tk.Entry(self.frame_input_n, show=None, font=('Arial', 14), textvariable=self.n, width=12)  # 输入框
+        self.input_start_str = tk.Label(self.frame_input_n, text='初始规模:', font=('Arial', 12), height=2)
+        self.input_start_box = tk.Entry(self.frame_input_n, show=None, font=('Arial', 14), textvariable=self.start, width=8)
+        self.input_step_str = tk.Label(self.frame_input_n, text='步长:', font=('Arial', 12), height=2)
+        self.input_step_box = tk.Entry(self.frame_input_n, show=None, font=('Arial', 14), textvariable=self.step, width=8)
+
         self.l.pack(side="left")
+        self.e1.pack(side="left")
+        self.input_start_str.pack(side="left")
+        self.input_start_box.pack(side="left")
+        self.input_step_str.pack(side="left")
+        self.input_step_box.pack(side="left")
 
 class select_window():
     def __init__(self, master=None):
@@ -213,6 +277,7 @@ class data_style_box():
         self.r2.grid(row=0, column=1)
         self.r3 = tk.Radiobutton(self.frame_data_style, text='逆序', variable=self.var, value='reorder', command=None)
         self.r3.grid(row=0, column=2)
+        self.var.set("out_order")
 
 class seplit_line():
     #分割线
@@ -222,14 +287,17 @@ class seplit_line():
         #self.seplit1.pack(fill=tk.X)
 
 class run_botton():
-    def __init__(self,master, checkVardict, n, datastyle):
+    def __init__(self,master, checkVardict, n, start, step, datastyle, data_trans):
         self.root = master
         self.num = n #数据的规模
+        self.start = start
+        self.step = step
         self.datastyle = datastyle
         self.checkVardict = checkVardict #多选框的值
         self.selected_dict = {}
         self.imnames = []  #用于保存生成的图片的名字
         self.runbutton = tk.Button(self.root, text='RUN', font=('Arial', 12), width=10, height=1, command=self.run)
+        self.data_trans = data_trans
 
     def run(self):  #只是测试一下
         #生成图片的名字
@@ -247,6 +315,8 @@ class run_botton():
                 self.selected_dict[func] = name
         a = algorithm_analysis(self.selected_dict)
         n = int(self.num.get())
+        start = int(self.start.get())
+        step = int(self.step.get())
 
         popup = tk.Toplevel()
         tk.Label(popup, text="程序正在运行").grid(row=0, column=0)
@@ -255,16 +325,20 @@ class run_botton():
         progress_bar = ttk.Progressbar(popup, variable=progress_var, maximum=len(list(a.sort_algorithms.keys())) - 1)
         progress_bar.grid(row=1, column=0)  # .pack(fill=tk.X, expand=1, side=tk.BOTTOM)
         popup.pack_slaves()
-        for i in a.test_time(n,self.datastyle.get()):        #计算运行的时间
+        for i in a.test_time(n, start, step, self.datastyle.get()):        #计算运行的时间
             popup.update()
             progress = i;
             progress_var.set(progress)
 
-        try:
-            ##把图片画回去
-            drawCostTime(a.costed_time,int(self.num.get()),self.imnames[-1])
-        except:
-            messagebox.showinfo(title='保存图片出错', message=self.imnames[-1])
+        print("success")
+
+        self.data_trans.set_data(a)
+
+        # try:
+        #     ##把图片画回去
+        #     drawCostTime(a.costed_time,int(self.num.get()),self.imnames[-1])
+        # except:
+        #     messagebox.showinfo(title='保存图片出错', message=self.imnames[-1])
 
     def show(self):
         ls = ""
@@ -276,6 +350,16 @@ class run_botton():
         ls += "the datastyle %s\n"%self.datastyle.get()
         messagebox.showinfo(title='不知道起什么', message=ls)
 
+
+class DataTrans():
+    def __init__(self):
+        self.data = None
+
+    def get_data(self):
+        return self.data
+
+    def set_data(self, data):
+        self.data = data
 
 if __name__ == '__main__':
     mi = MainPage(tk.Tk())#
