@@ -44,7 +44,7 @@ class MainPage(object):
     def selectData(self):
         self.selectPage.pack_all()
         self.regressPage.pack_forget_all()
-        self.countPage.pack_forget()
+        self.countPage.pack_forget_all()
         self.aboutPage.pack_forget()
 
     def regressData(self):
@@ -53,19 +53,20 @@ class MainPage(object):
         self.regressPage.getimnames(imnames)   #更新文件名
         self.regressPage.showfun()
         self.regressPage.pack_all()
-        self.countPage.pack_forget()
+        self.countPage.pack_forget_all()
         self.aboutPage.pack_forget()
 
     def countData(self):
+        self.countPage.add_result()
         self.selectPage.pack_forget_all()
         self.regressPage.pack_forget_all()
-        self.countPage.pack()
+        self.countPage.pack_all()
         self.aboutPage.pack_forget()
 
     def aboutDisp(self):
         self.selectPage.pack_forget_all()
         self.regressPage.pack_forget_all()
-        self.countPage.pack_forget()
+        self.countPage.pack_forget_all()
         self.aboutPage.pack()
 
 
@@ -183,6 +184,7 @@ class regressFrame(Frame):  # 继承Frame类
         data = self.data_trans.get_data()
         helper = RegressionHelper(data)
         result = helper.regression()
+        self.data_trans.set_data(label='regression', data=result)
         self.showChart(data=result)
 
 
@@ -207,17 +209,46 @@ class CountFrame(Frame):  # 继承Frame类
     def __init__(self, master=None, data_trans=None):
         Frame.__init__(self, master)
         self.root = master  # 定义内部变量root
+        self.msg = tk.StringVar()
+        self.msg.set('请先进行回归分析')
         self.createPage()
         self.data_trans = data_trans
 
     def createPage(self):
         Label(self, text='统计界面').pack()
 
-    def add_result(self, data):
-        pass
+        self.msgLabel = Label(self, textvariable=self.msg, font=('微软雅黑', 14), justify='left')
 
+    def add_result(self):
+        # create string
+        data = self.data_trans.get_data(label='regression')
+        if data is not None:
+            outStr = ''
+            for item in data.keys():
+                outStr += item
+                if data[item]['type'] == 'nlogn':
+                    outStr += f':\n\t时间复杂度函数估算：' \
+                        f'f(n)={data[item]["param"][0]:.4} * n * logn ' \
+                        f'+ {data[item]["param"][1]:.4}'
+                    outStr += f':\n\t拟合函数误差：{data[item]["cost"]}\n\n'
 
+                elif data[item]['type'] == 'n2':
+                    outStr += f':\n\t时间复杂度函数估算：' \
+                        f'f(n)={data[item]["param"][0]:.4} * n^2 ' \
+                        f'+ {data[item]["param"][1]:.4}'
+                    outStr += f':\n\t拟合函数误差：{data[item]["cost"]}\n\n'
 
+            print(outStr)
+            self.msg.set(outStr)
+            self.msgLabel.update()
+
+    def pack_all(self):
+        self.msgLabel.pack()
+        self.pack()
+
+    def pack_forget_all(self):
+        self.msgLabel.pack_forget()
+        self.pack_forget()
 
 class AboutFrame(Frame):  # 继承Frame类
     def __init__(self, master=None):
@@ -339,7 +370,7 @@ class run_botton():
 
         print("success")
 
-        self.data_trans.set_data(a)
+        self.data_trans.set_data(data=a)
 
         # try:
         #     ##把图片画回去
@@ -360,13 +391,20 @@ class run_botton():
 
 class DataTrans():
     def __init__(self):
-        self.data = None
+        self.data = {'alys':None,
+                     'regression':None,
+                     }
 
-    def get_data(self):
-        return self.data
+    def get_data(self, label='alys'):
+        ret = None
+        if label=='alys':
+            ret = self.data['alys']
+        elif label=='regression':
+            ret = self.data['regression']
+        return ret
 
-    def set_data(self, data):
-        self.data = data
+    def set_data(self, label='alys', data=None):
+        self.data[label] = data
 
 if __name__ == '__main__':
     mi = MainPage(tk.Tk())#
