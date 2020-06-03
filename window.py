@@ -32,7 +32,7 @@ class MainPage(object):
         # 创建不同Frame
         self.selectPage = selectFrame(self.root, data_trans=self.data_trans)  #算法的选择窗口
         self.regressPage = regressFrame(self.root, data_trans=self.data_trans)  #显示和回归分析窗口
-        self.countPage = CountFrame(self.root)    #统计窗口
+        self.countPage = CountFrame(self.root, data_trans=self.data_trans)    #统计窗口
         self.aboutPage = AboutFrame(self.root)    #相关窗口
         self.selectPage.pack_all()  # 默认显示数据录入界面
         menubar = tk.Menu(self.root)
@@ -51,6 +51,7 @@ class MainPage(object):
         self.selectPage.pack_forget_all()
         imnames = self.selectPage.run_botton.imnames;
         self.regressPage.getimnames(imnames)   #更新文件名
+        self.regressPage.showfun()
         self.regressPage.pack_all()
         self.countPage.pack_forget()
         self.aboutPage.pack_forget()
@@ -118,7 +119,7 @@ class regressFrame(Frame):  # 继承Frame类
         self.createCanvas()
 
     def createCanvas(self):
-        self.fig = Figure(figsize=(5, 4), dpi=100)
+        self.fig = Figure(figsize=(7, 5), dpi=80)
         self.canvas = FigureCanvasTkAgg(self.fig, self)
         self.canvas.get_tk_widget().pack(side=tk.BOTTOM)
 
@@ -203,13 +204,19 @@ class regressFrame(Frame):  # 继承Frame类
         self.pack_forget()
 
 class CountFrame(Frame):  # 继承Frame类
-    def __init__(self, master=None):
+    def __init__(self, master=None, data_trans=None):
         Frame.__init__(self, master)
         self.root = master  # 定义内部变量root
         self.createPage()
+        self.data_trans = data_trans
 
     def createPage(self):
         Label(self, text='统计界面').pack()
+
+    def add_result(self, data):
+        pass
+
+
 
 
 class AboutFrame(Frame):  # 继承Frame类
