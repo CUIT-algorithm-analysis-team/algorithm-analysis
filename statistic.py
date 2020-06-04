@@ -41,14 +41,22 @@ class algorithm_analysis:
         else:
             data_loader = dataset.load_reorder_data
 
-        for i, sort_fun in enumerate(list(self.sort_algorithms.keys())):
-            for l in data_loader(n, start, step):
+        # for i, sort_fun in enumerate(list(self.sort_algorithms.keys())):
+        #     for l in data_loader(n, start, step):
+        #         t0 = time.time()
+        #         result = sort_fun(l)
+        #         t1 = time.time()
+        #         self.costed_time[self.sort_algorithms[sort_fun]].append(t1 - t0)
+        #         self.question_size[self.sort_algorithms[sort_fun]].append(len(l))
+        #         yield i
+        for i, data in enumerate(data_loader(n, start, step)):
+            for sort_func in list(self.sort_algorithms.keys()):
                 t0 = time.time()
-                result = sort_fun(l)
+                result = sort_func(data)
                 t1 = time.time()
-                self.costed_time[self.sort_algorithms[sort_fun]].append(t1 - t0)
-                self.question_size[self.sort_algorithms[sort_fun]].append(len(l))
-                yield i
+                self.costed_time[self.sort_algorithms[sort_func]].append(t1 - t0)
+                self.question_size[self.sort_algorithms[sort_func]].append(len(data))
+            yield i
 
     def test_space(self,n):
         """
