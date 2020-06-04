@@ -357,16 +357,21 @@ class run_botton():
         step = int(self.step.get())
 
         popup = tk.Toplevel()
+        percent_var = tk.StringVar()
         tk.Label(popup, text="程序正在运行").grid(row=0, column=0)
+        percent = tk.Label(popup, textvariable=percent_var).grid(row=1, column=1)
         progress = 0
         progress_var = tk.DoubleVar()
-        progress_bar = ttk.Progressbar(popup, variable=progress_var, maximum=len(list(a.sort_algorithms.keys())) - 1)
+        # progress_bar = ttk.Progressbar(popup, variable=progress_var, maximum=len(list(a.sort_algorithms.keys())) - 1)
+        maxIter = int((n-start)/step) + 1
+        progress_bar = ttk.Progressbar(popup, variable=progress_var, maximum=maxIter)
         progress_bar.grid(row=1, column=0)  # .pack(fill=tk.X, expand=1, side=tk.BOTTOM)
         popup.pack_slaves()
         for i in a.test_time(n, start, step, self.datastyle.get()):        #计算运行的时间
             popup.update()
-            progress = i;
+            progress = i
             progress_var.set(progress)
+            percent_var.set(f"{(progress / maxIter)*100:0.2f}%")
 
         # print("success")
         popup.destroy()
