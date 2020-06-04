@@ -369,6 +369,9 @@ class run_botton():
             progress_var.set(progress)
 
         print("success")
+        popup.destroy()
+        messagebox.showinfo("","算法执行完毕，数据已保存，可以开始分析")
+
 
         self.data_trans.set_data(data=a)
 
