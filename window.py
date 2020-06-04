@@ -230,15 +230,15 @@ class CountFrame(Frame):  # 继承Frame类
                     outStr += f':\n\t时间复杂度函数估算：' \
                         f'f(n)={data[item]["param"][0]:.4} * n * logn ' \
                         f'+ {data[item]["param"][1]:.4}'
-                    outStr += f':\n\t拟合函数误差：{data[item]["cost"]}\n\n'
+                    outStr += f'\n\t拟合函数误差：{data[item]["cost"]}\n\n'
 
                 elif data[item]['type'] == 'n2':
                     outStr += f':\n\t时间复杂度函数估算：' \
                         f'f(n)={data[item]["param"][0]:.4} * n^2 ' \
                         f'+ {data[item]["param"][1]:.4}'
-                    outStr += f':\n\t拟合函数误差：{data[item]["cost"]}\n\n'
+                    outStr += f'\n\t拟合函数误差：{data[item]["cost"]}\n\n'
 
-            print(outStr)
+            # print(outStr)
             self.msg.set(outStr)
             self.msgLabel.update()
 
@@ -368,7 +368,7 @@ class run_botton():
             progress = i;
             progress_var.set(progress)
 
-        print("success")
+        # print("success")
         popup.destroy()
         messagebox.showinfo("","算法执行完毕，数据已保存，可以开始分析")
 
